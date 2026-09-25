@@ -96,9 +96,10 @@ API Documentation
    api/style
    api/text
    api/table
-   api/section
-   api/comments
-   api/shape
+  api/section
+  api/comments
+   api/field
+  api/shape
    api/dml
    api/shared
    api/enum/index

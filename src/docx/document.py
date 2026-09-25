@@ -17,6 +17,7 @@ from docx.text.run import Run
 if TYPE_CHECKING:
     import docx.types as t
     from docx.comments import Comment, Comments
+    from docx.field import Field
     from docx.oxml.document import CT_Body, CT_Document
     from docx.parts.document import DocumentPart
     from docx.settings import Settings
@@ -166,6 +167,18 @@ class Document(ElementProxy):
     def core_properties(self):
         """A |CoreProperties| object providing Dublin Core properties of document."""
         return self._part.core_properties
+
+    @property
+    def fields(self) -> List[Field]:
+        """The top-level fields in the main document story, in document order.
+
+        Both simple (``w:fldSimple``) and complex (``w:fldChar``) fields are
+        recognized. Fields nested inside another field are accessed through
+        ``Field.children``; fields in table cells, headers, and footers are
+        reached through the ``.fields`` property of their own container, each
+        of which is parsed as a separate story.
+        """
+        return self._body.fields
 
     @property
     def inline_shapes(self):

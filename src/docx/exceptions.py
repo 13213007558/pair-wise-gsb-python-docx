@@ -16,3 +16,8 @@ class InvalidSpanError(PythonDocxError):
 class InvalidXmlError(PythonDocxError):
     """Raised when invalid XML is encountered, such as on attempt to access a missing
     required child element."""
+
+
+class UnclosedFieldError(PythonDocxError):
+    """Raised when an operation requires a well-formed field but the field has no
+    matching `end` field-char in its story."""

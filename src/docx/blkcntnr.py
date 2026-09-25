@@ -12,6 +12,7 @@ from typing import TYPE_CHECKING, Iterator
 
 from typing_extensions import TypeAlias
 
+from docx.field import iter_fields
 from docx.oxml.table import CT_Tbl
 from docx.oxml.text.paragraph import CT_P
 from docx.shared import StoryChild
@@ -19,6 +20,7 @@ from docx.text.paragraph import Paragraph
 
 if TYPE_CHECKING:
     import docx.types as t
+    from docx.field import Field
     from docx.oxml.comments import CT_Comment
     from docx.oxml.document import CT_Body
     from docx.oxml.section import CT_HdrFtr
@@ -77,6 +79,19 @@ class BlockItemContainer(StoryChild):
 
         for element in self._element.inner_content_elements:
             yield (Paragraph(element, self) if isinstance(element, CT_P) else Table(element, self))
+
+    @property
+    def fields(self) -> list[Field]:
+        """The top-level fields in this story, in document order.
+
+        Both simple (`w:fldSimple`) and complex (`w:fldChar`) fields are
+        recognized; fields nested inside another field are accessed through
+        `Field.children`. Each story is parsed independently: fields inside
+        nested table cells or text boxes are not included here and are
+        reached through the `.fields` property of their own container.
+        Unclosed fields are included with `Field.is_broken` |True|.
+        """
+        return iter_fields(self._element)
 
     @property
     def paragraphs(self):
