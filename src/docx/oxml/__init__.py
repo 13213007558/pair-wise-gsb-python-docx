@@ -91,6 +91,13 @@ from .comments import CT_Comments, CT_Comment
 register_element_cls("w:comments", CT_Comments)
 register_element_cls("w:comment", CT_Comment)
 
+from .notes import CT_Endnotes, CT_Endnote, CT_Footnotes, CT_Footnote
+
+register_element_cls("w:footnotes", CT_Footnotes)
+register_element_cls("w:footnote", CT_Footnote)
+register_element_cls("w:endnotes", CT_Endnotes)
+register_element_cls("w:endnote", CT_Endnote)
+
 from .coreprops import CT_CoreProperties
 
 register_element_cls("cp:coreProperties", CT_CoreProperties)

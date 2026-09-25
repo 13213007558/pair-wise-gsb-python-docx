@@ -101,6 +101,26 @@ class CT_R(BaseOxmlElement):
         """Insert a `w:commentRangeStart` element with `comment_id` before this run."""
         self.addprevious(OxmlElement("w:commentRangeStart", attrs={qn("w:id"): str(comment_id)}))
 
+    def insert_endnote_reference_below(self, endnote_id: int) -> CT_R:
+        """Insert an endnote-reference run immediately after this run.
+
+        The new `w:r` contains a `w:endnoteReference` element referencing
+        `endnote_id` and is returned.
+        """
+        reference_run = self._new_note_reference_run("endnote", endnote_id)
+        self.addnext(reference_run)
+        return reference_run
+
+    def insert_footnote_reference_below(self, footnote_id: int) -> CT_R:
+        """Insert a footnote-reference run immediately after this run.
+
+        The new `w:r` contains a `w:footnoteReference` element referencing
+        `footnote_id` and is returned.
+        """
+        reference_run = self._new_note_reference_run("footnote", footnote_id)
+        self.addnext(reference_run)
+        return reference_run
+
     @property
     def lastRenderedPageBreaks(self) -> List[CT_LastRenderedPageBreak]:
         """All `w:lastRenderedPageBreaks` descendants of this run."""
@@ -161,6 +181,24 @@ class CT_R(BaseOxmlElement):
         rPr = r.get_or_add_rPr()
         rPr.style = "CommentReference"
         r.append(OxmlElement("w:commentReference", attrs={qn("w:id"): str(comment_id)}))
+        return r
+
+    def _new_note_reference_run(self, note_kind: str, note_id: int) -> CT_R:
+        """Return a new `w:r` element containing a note-reference for `note_id`.
+
+        `note_kind` is "footnote" or "endnote". For a footnote the result looks
+        like this:
+
+            <w:r>
+              <w:rPr><w:rStyle w:val="FootnoteReference"/></w:rPr>
+              <w:footnoteReference w:id="2"/>
+            </w:r>
+
+        """
+        r = cast(CT_R, OxmlElement("w:r"))
+        rPr = r.get_or_add_rPr()
+        rPr.style = "FootnoteReference" if note_kind == "footnote" else "EndnoteReference"
+        r.append(OxmlElement("w:%sReference" % note_kind, attrs={qn("w:id"): str(note_id)}))
         return r
 
 

@@ -17,6 +17,7 @@ from docx.text.run import Run
 if TYPE_CHECKING:
     import docx.types as t
     from docx.comments import Comment, Comments
+    from docx.notes import Endnote, Endnotes, Footnote, Footnotes
     from docx.oxml.document import CT_Body, CT_Document
     from docx.parts.document import DocumentPart
     from docx.settings import Settings
@@ -86,6 +87,49 @@ class Document(ElementProxy):
         first_run.mark_comment_range(last_run, comment.comment_id)
 
         return comment
+
+    def add_endnote(self, run: Run, text: str = "") -> Endnote:
+        """Add an endnote to the document, referenced immediately after `run`.
+
+        An endnote-reference mark is inserted at the run boundary directly
+        following `run`, and the corresponding `w:endnote` is added to the
+        endnotes part with a unique endnote-id.
+
+        `text` allows the contents of a simple endnote to be provided in the
+        call. More complex endnotes can be composed using the returned
+        |Endnote| object in much the same way as a (table) `Cell` object, using
+        methods like `.add_paragraph()` and `.add_table()`. Paragraphs in an
+        endnote can contain rich text, hyperlinks, and images; relationships
+        for those are added to the endnotes part, not the main document part.
+
+        The same endnote can be referenced from additional places in the
+        document using `Endnote.add_reference()`.
+        """
+        endnote = self.endnotes.add_endnote(text=text)
+        endnote.add_reference(run)
+        return endnote
+
+    def add_footnote(self, run: Run, text: str = "") -> Footnote:
+        """Add a footnote to the document, referenced immediately after `run`.
+
+        A footnote-reference mark is inserted at the run boundary directly
+        following `run`, and the corresponding `w:footnote` is added to the
+        footnotes part with a unique footnote-id.
+
+        `text` allows the contents of a simple footnote to be provided in the
+        call. More complex footnotes can be composed using the returned
+        |Footnote| object in much the same way as a (table) `Cell` object,
+        using methods like `.add_paragraph()` and `.add_table()`. Paragraphs
+        in a footnote can contain rich text, hyperlinks, and images;
+        relationships for those are added to the footnotes part, not the main
+        document part.
+
+        The same footnote can be referenced from additional places in the
+        document using `Footnote.add_reference()`.
+        """
+        footnote = self.footnotes.add_footnote(text=text)
+        footnote.add_reference(run)
+        return footnote
 
     def add_heading(self, text: str = "", level: int = 1):
         """Return a heading paragraph newly added to the end of the document.
@@ -166,6 +210,16 @@ class Document(ElementProxy):
     def core_properties(self):
         """A |CoreProperties| object providing Dublin Core properties of document."""
         return self._part.core_properties
+
+    @property
+    def endnotes(self) -> Endnotes:
+        """An |Endnotes| object providing access to the endnotes of this document."""
+        return self._part.endnotes
+
+    @property
+    def footnotes(self) -> Footnotes:
+        """A |Footnotes| object providing access to the footnotes of this document."""
+        return self._part.footnotes
 
     @property
     def inline_shapes(self):
