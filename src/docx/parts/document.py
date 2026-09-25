@@ -8,6 +8,7 @@ from docx.document import Document
 from docx.opc.constants import RELATIONSHIP_TYPE as RT
 from docx.parts.comments import CommentsPart
 from docx.parts.hdrftr import FooterPart, HeaderPart
+from docx.parts.notes import EndnotesPart, FootnotesPart
 from docx.parts.numbering import NumberingPart
 from docx.parts.settings import SettingsPart
 from docx.parts.story import StoryPart
@@ -18,6 +19,7 @@ from docx.shared import lazyproperty
 if TYPE_CHECKING:
     from docx.comments import Comments
     from docx.enum.style import WD_STYLE_TYPE
+    from docx.notes import Endnotes, Footnotes
     from docx.opc.coreprops import CoreProperties
     from docx.settings import Settings
     from docx.styles.style import BaseStyle
@@ -59,6 +61,16 @@ class DocumentPart(StoryPart):
     def document(self):
         """A |Document| object providing access to the content of this document."""
         return Document(self._element, self)
+
+    @property
+    def endnotes(self) -> Endnotes:
+        """|Endnotes| object providing access to the endnotes of this document."""
+        return self._endnotes_part.endnotes
+
+    @property
+    def footnotes(self) -> Footnotes:
+        """|Footnotes| object providing access to the footnotes of this document."""
+        return self._footnotes_part.footnotes
 
     def drop_header_part(self, rId: str) -> None:
         """Remove related header part identified by `rId`."""
@@ -138,6 +150,34 @@ class DocumentPart(StoryPart):
             comments_part = CommentsPart.default(self.package)
             self.relate_to(comments_part, RT.COMMENTS)
             return comments_part
+
+    @property
+    def _endnotes_part(self) -> EndnotesPart:
+        """An |EndnotesPart| object providing access to the endnotes of this document.
+
+        Creates a default endnotes part if one is not present.
+        """
+        try:
+            return cast(EndnotesPart, self.part_related_by(RT.ENDNOTES))
+        except KeyError:
+            assert self.package is not None
+            endnotes_part = EndnotesPart.default(self.package)
+            self.relate_to(endnotes_part, RT.ENDNOTES)
+            return endnotes_part
+
+    @property
+    def _footnotes_part(self) -> FootnotesPart:
+        """A |FootnotesPart| object providing access to the footnotes of this document.
+
+        Creates a default footnotes part if one is not present.
+        """
+        try:
+            return cast(FootnotesPart, self.part_related_by(RT.FOOTNOTES))
+        except KeyError:
+            assert self.package is not None
+            footnotes_part = FootnotesPart.default(self.package)
+            self.relate_to(footnotes_part, RT.FOOTNOTES)
+            return footnotes_part
 
     @property
     def _settings_part(self) -> SettingsPart:

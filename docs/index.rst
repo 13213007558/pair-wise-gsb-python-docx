@@ -97,8 +97,9 @@ API Documentation
    api/text
    api/table
    api/section
-   api/comments
-   api/shape
+  api/comments
+   api/notes
+  api/shape
    api/dml
    api/shared
    api/enum/index

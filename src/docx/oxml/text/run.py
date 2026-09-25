@@ -101,6 +101,18 @@ class CT_R(BaseOxmlElement):
         """Insert a `w:commentRangeStart` element with `comment_id` before this run."""
         self.addprevious(OxmlElement("w:commentRangeStart", attrs={qn("w:id"): str(comment_id)}))
 
+    def insert_endnote_reference_below(self, endnote_id: int) -> None:
+        """Insert a `w:endnoteReference` run with `endnote_id` after this run."""
+        self.addnext(
+            self._new_note_reference_run("w:endnoteReference", "EndnoteReference", endnote_id)
+        )
+
+    def insert_footnote_reference_below(self, footnote_id: int) -> None:
+        """Insert a `w:footnoteReference` run with `footnote_id` after this run."""
+        self.addnext(
+            self._new_note_reference_run("w:footnoteReference", "FootnoteReference", footnote_id)
+        )
+
     @property
     def lastRenderedPageBreaks(self) -> List[CT_LastRenderedPageBreak]:
         """All `w:lastRenderedPageBreaks` descendants of this run."""
@@ -161,6 +173,26 @@ class CT_R(BaseOxmlElement):
         rPr = r.get_or_add_rPr()
         rPr.style = "CommentReference"
         r.append(OxmlElement("w:commentReference", attrs={qn("w:id"): str(comment_id)}))
+        return r
+
+    def _new_note_reference_run(
+        self, reference_tag: str, reference_style: str, note_id: int
+    ) -> CT_R:
+        """Return a new `w:r` element referencing the note identified by `note_id`.
+
+        `reference_tag` is `"w:footnoteReference"` or `"w:endnoteReference"` and
+        `reference_style` is the corresponding character-style id. Should look like:
+
+            <w:r>
+              <w:rPr><w:rStyle w:val="FootnoteReference"/></w:rPr>
+              <w:footnoteReference w:id="2"/>
+            </w:r>
+
+        """
+        r = cast(CT_R, OxmlElement("w:r"))
+        rPr = r.get_or_add_rPr()
+        rPr.style = reference_style
+        r.append(OxmlElement(reference_tag, attrs={qn("w:id"): str(note_id)}))
         return r
 
 

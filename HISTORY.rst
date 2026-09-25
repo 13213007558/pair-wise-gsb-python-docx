@@ -3,6 +3,13 @@
 Release History
 ---------------
 
+next (unreleased)
++++++++++++++++++
+
+- Add support for footnotes and endnotes
+- Add Paragraph.add_hyperlink()
+
+
 1.2.0 (2025-06-16)
 ++++++++++++++++++
 

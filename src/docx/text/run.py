@@ -18,6 +18,7 @@ from docx.text.pagebreak import RenderedPageBreak
 if TYPE_CHECKING:
     import docx.types as t
     from docx.enum.text import WD_UNDERLINE
+    from docx.notes import Endnote, Footnote
     from docx.oxml.text.run import CT_R, CT_Text
     from docx.shared import Length
 
@@ -55,6 +56,50 @@ class Run(StoryChild):
             br.type = type_
         if clear is not None:
             br.clear = clear
+
+    def add_endnote(self, text: str = "") -> Endnote:
+        """Return a new |Endnote| referenced from immediately after this run.
+
+        The new endnote is added to the endnotes of the document and a reference to it
+        is inserted as a new run directly following this run. If `text` is provided,
+        it is added to the endnote; multiple paragraphs can be added by separating
+        their text with newlines.
+        """
+        endnote = self.part._document_part.endnotes.add_endnote(text)  # pyright: ignore[reportPrivateUsage]
+        self._r.insert_endnote_reference_below(endnote.note_id)
+        return endnote
+
+    def add_endnote_reference(self, endnote: Endnote | int) -> None:
+        """Insert a reference to `endnote` as a new run immediately after this run.
+
+        `endnote` can be an |Endnote| object or an endnote-id. Referencing the same
+        endnote from more than one position causes its displayed number to appear at
+        each referencing position.
+        """
+        endnote_id = getattr(endnote, "note_id", endnote)
+        self._r.insert_endnote_reference_below(endnote_id)
+
+    def add_footnote(self, text: str = "") -> Footnote:
+        """Return a new |Footnote| referenced from immediately after this run.
+
+        The new footnote is added to the footnotes of the document and a reference to
+        it is inserted as a new run directly following this run. If `text` is
+        provided, it is added to the footnote; multiple paragraphs can be added by
+        separating their text with newlines.
+        """
+        footnote = self.part._document_part.footnotes.add_footnote(text)  # pyright: ignore[reportPrivateUsage]
+        self._r.insert_footnote_reference_below(footnote.note_id)
+        return footnote
+
+    def add_footnote_reference(self, footnote: Footnote | int) -> None:
+        """Insert a reference to `footnote` as a new run immediately after this run.
+
+        `footnote` can be a |Footnote| object or a footnote-id. Referencing the same
+        footnote from more than one position causes its displayed number to appear at
+        each referencing position.
+        """
+        footnote_id = getattr(footnote, "note_id", footnote)
+        self._r.insert_footnote_reference_below(footnote_id)
 
     def add_picture(
         self,

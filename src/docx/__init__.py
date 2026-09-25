@@ -29,6 +29,7 @@ from docx.parts.comments import CommentsPart
 from docx.parts.document import DocumentPart
 from docx.parts.hdrftr import FooterPart, HeaderPart
 from docx.parts.image import ImagePart
+from docx.parts.notes import EndnotesPart, FootnotesPart
 from docx.parts.numbering import NumberingPart
 from docx.parts.settings import SettingsPart
 from docx.parts.styles import StylesPart
@@ -44,7 +45,9 @@ PartFactory.part_class_selector = part_class_selector
 PartFactory.part_type_for[CT.OPC_CORE_PROPERTIES] = CorePropertiesPart
 PartFactory.part_type_for[CT.WML_COMMENTS] = CommentsPart
 PartFactory.part_type_for[CT.WML_DOCUMENT_MAIN] = DocumentPart
+PartFactory.part_type_for[CT.WML_ENDNOTES] = EndnotesPart
 PartFactory.part_type_for[CT.WML_FOOTER] = FooterPart
+PartFactory.part_type_for[CT.WML_FOOTNOTES] = FootnotesPart
 PartFactory.part_type_for[CT.WML_HEADER] = HeaderPart
 PartFactory.part_type_for[CT.WML_NUMBERING] = NumberingPart
 PartFactory.part_type_for[CT.WML_SETTINGS] = SettingsPart
@@ -55,7 +58,9 @@ del (
     CorePropertiesPart,
     CommentsPart,
     DocumentPart,
+    EndnotesPart,
     FooterPart,
+    FootnotesPart,
     HeaderPart,
     NumberingPart,
     PartFactory,

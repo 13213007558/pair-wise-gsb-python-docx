@@ -17,6 +17,7 @@ from docx.text.run import Run
 if TYPE_CHECKING:
     import docx.types as t
     from docx.comments import Comment, Comments
+    from docx.notes import Endnotes, Footnotes
     from docx.oxml.document import CT_Body, CT_Document
     from docx.parts.document import DocumentPart
     from docx.settings import Settings
@@ -166,6 +167,16 @@ class Document(ElementProxy):
     def core_properties(self):
         """A |CoreProperties| object providing Dublin Core properties of document."""
         return self._part.core_properties
+
+    @property
+    def endnotes(self) -> Endnotes:
+        """An |Endnotes| object providing access to the endnotes of this document."""
+        return self._part.endnotes
+
+    @property
+    def footnotes(self) -> Footnotes:
+        """A |Footnotes| object providing access to the footnotes of this document."""
+        return self._part.footnotes
 
     @property
     def inline_shapes(self):

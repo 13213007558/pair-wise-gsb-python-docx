@@ -5,6 +5,9 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Iterator, List, cast
 
 from docx.enum.style import WD_STYLE_TYPE
+from docx.opc.constants import RELATIONSHIP_TYPE as RT
+from docx.oxml.ns import qn
+from docx.oxml.parser import OxmlElement
 from docx.oxml.text.run import CT_R
 from docx.shared import StoryChild
 from docx.styles.style import ParagraphStyle
@@ -16,6 +19,7 @@ from docx.text.run import Run
 if TYPE_CHECKING:
     import docx.types as t
     from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
+    from docx.oxml.text.hyperlink import CT_Hyperlink
     from docx.oxml.text.paragraph import CT_P
     from docx.styles.style import CharacterStyle
 
@@ -42,6 +46,34 @@ class Paragraph(StoryChild):
         if style:
             run.style = style
         return run
+
+    def add_hyperlink(self, text: str = "", address: str = "") -> Hyperlink:
+        """Return a new |Hyperlink| appended to the content of this paragraph.
+
+        The hyperlink displays `text` and navigates to `address` when clicked.
+        `address` is commonly a URL like "https://python.org" but can be any valid
+        hyperlink target.
+
+        The hyperlink relationship is added to the part containing this paragraph,
+        which may be the document part or a story part like a footnotes, endnotes,
+        comments, or header part. This ensures hyperlinks added within a note or
+        comment reference relationships of their own part rather than borrowing a
+        relationship id from the document part.
+        """
+        rId = self.part.relate_to(address, RT.HYPERLINK, is_external=True)
+
+        hyperlink = OxmlElement("w:hyperlink")
+        hyperlink.set(qn("r:id"), rId)
+        self._p.append(hyperlink)
+
+        r = cast(CT_R, OxmlElement("w:r"))
+        r.style = "Hyperlink"
+        hyperlink.append(r)
+        run = Run(r, self)
+        if text:
+            run.text = text
+
+        return Hyperlink(cast("CT_Hyperlink", hyperlink), self)
 
     @property
     def alignment(self) -> WD_PARAGRAPH_ALIGNMENT | None:

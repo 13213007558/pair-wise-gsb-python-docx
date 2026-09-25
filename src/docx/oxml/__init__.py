@@ -111,6 +111,13 @@ register_element_cls("w:numPr", CT_NumPr)
 register_element_cls("w:numbering", CT_Numbering)
 register_element_cls("w:startOverride", CT_DecimalNumber)
 
+from .notes import CT_Endnote, CT_Endnotes, CT_Footnote, CT_Footnotes
+
+register_element_cls("w:endnote", CT_Endnote)
+register_element_cls("w:endnotes", CT_Endnotes)
+register_element_cls("w:footnote", CT_Footnote)
+register_element_cls("w:footnotes", CT_Footnotes)
+
 from .section import (
     CT_HdrFtr,
     CT_HdrFtrRef,
