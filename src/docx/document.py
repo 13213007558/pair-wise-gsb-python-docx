@@ -17,6 +17,7 @@ from docx.text.run import Run
 if TYPE_CHECKING:
     import docx.types as t
     from docx.comments import Comment, Comments
+    from docx.numbering import ListItem
     from docx.oxml.document import CT_Body, CT_Document
     from docx.parts.document import DocumentPart
     from docx.settings import Settings
@@ -180,6 +181,18 @@ class Document(ElementProxy):
     def iter_inner_content(self) -> Iterator[Paragraph | Table]:
         """Generate each `Paragraph` or `Table` in this document in document order."""
         return self._body.iter_inner_content()
+
+    def iter_list_items(self) -> "Iterator[ListItem]":
+        """Generate a |ListItem| for each numbered paragraph in this document.
+
+        Items are produced in document order, including paragraphs inside tables.
+        Each item carries the resolved numbering label text (e.g. `"2.3.a"`), the
+        numbering level, and the numbering definition used. This is a read-only
+        operation; `numbering.xml` is never modified.
+        """
+        from docx.numbering import iter_list_items
+
+        return iter_list_items(self)
 
     @property
     def paragraphs(self) -> List[Paragraph]:
