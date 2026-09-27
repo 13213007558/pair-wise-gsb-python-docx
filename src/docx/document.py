@@ -10,6 +10,7 @@ from typing import IO, TYPE_CHECKING, Iterator, List, Sequence
 from docx.blkcntnr import BlockItemContainer
 from docx.enum.section import WD_SECTION
 from docx.enum.text import WD_BREAK
+from docx.opc.constants import RELATIONSHIP_TYPE as RT
 from docx.section import Section, Sections
 from docx.shared import ElementProxy, Emu, Inches, Length
 from docx.text.run import Run
@@ -17,8 +18,10 @@ from docx.text.run import Run
 if TYPE_CHECKING:
     import docx.types as t
     from docx.comments import Comment, Comments
+    from docx.customxml import CustomXmlStores
     from docx.oxml.document import CT_Body, CT_Document
     from docx.parts.document import DocumentPart
+    from docx.sdt import BoundContentControl, BoundUpdateResult
     from docx.settings import Settings
     from docx.styles.style import ParagraphStyle, _TableStyle
     from docx.table import Table
@@ -168,6 +171,46 @@ class Document(ElementProxy):
         return self._part.core_properties
 
     @property
+    def custom_xml_stores(self) -> CustomXmlStores:
+        """A |CustomXmlStores| collection of the custom XML data-stores in this package.
+
+        Each store holds an arbitrary XML document that content controls can be
+        bound to with a w:dataBinding element.
+        """
+        from docx.customxml import CustomXmlStores
+
+        return CustomXmlStores(self._part.package)
+
+    def find_bound_controls(
+        self,
+        store_item_id: str | None = None,
+        xpath: str | None = None,
+    ) -> List[BoundContentControl]:
+        """Return a list of content controls bound to a custom XML data item.
+
+        When `store_item_id` is provided, only controls bound to that store are
+        returned (compared case-insensitively). When `xpath` is provided, only
+        controls bound with that XPath are returned. Controls in the document
+        body, headers, and footers are all searched, including those nested in
+        tables.
+        """
+        from docx.customxml import normalize_store_item_id
+
+        controls = []
+        for control in self.iter_bound_controls():
+            if store_item_id is not None:
+                if control.store_item_id is None:
+                    continue
+                if normalize_store_item_id(control.store_item_id) != normalize_store_item_id(
+                    store_item_id
+                ):
+                    continue
+            if xpath is not None and (control.xpath or "").strip() != xpath.strip():
+                continue
+            controls.append(control)
+        return controls
+
+    @property
     def inline_shapes(self):
         """The |InlineShapes| collection for this document.
 
@@ -180,6 +223,43 @@ class Document(ElementProxy):
     def iter_inner_content(self) -> Iterator[Paragraph | Table]:
         """Generate each `Paragraph` or `Table` in this document in document order."""
         return self._body.iter_inner_content()
+
+    def iter_bound_controls(self) -> Iterator[BoundContentControl]:
+        """Generate each content control bound to a custom XML data item.
+
+        Controls in the document body, headers, and footers are all included,
+        whether they appear at the top level or nested in a table.
+        """
+        from docx.sdt import BoundContentControl
+
+        for part in self._story_parts:
+            for sdt in part.element.xpath(".//w:sdt[w:sdtPr/w:dataBinding]"):
+                yield BoundContentControl(sdt, part)
+
+    def update_bound_controls(
+        self,
+        store_item_id: str,
+        xpath: str,
+        value,
+        namespaces: dict | None = None,
+    ) -> BoundUpdateResult:
+        """Update the custom XML data item and refresh all controls bound to it.
+
+        The data item is located by `store_item_id` and `xpath`, evaluated
+        with `namespaces` (a prefix-to-URI map). When `namespaces` is omitted,
+        the prefix mappings declared by the bound controls are used. Every
+        control bound to the same item, in the body, headers, footers, and
+        tables, has its displayed content refreshed according to its type
+        (plain text, date, or checkbox).
+
+        The update is atomic: raises |BindingConflictError| carrying locatable
+        conflicts when the store is missing, the XPath matches zero or multiple
+        nodes, or incompatible controls are bound to the same item. In that case
+        neither the stored XML nor any control display is modified.
+        """
+        from docx.sdt import update_bound_controls
+
+        return update_bound_controls(self, store_item_id, xpath, value, namespaces)
 
     @property
     def paragraphs(self) -> List[Paragraph]:
@@ -244,6 +324,20 @@ class Document(ElementProxy):
         if self.__body is None:
             self.__body = _Body(self._element.body, self)
         return self.__body
+
+    @property
+    def _story_parts(self) -> List[DocumentPart]:
+        """List of parts that can contain bound content controls.
+
+        The main document part plus any related header and footer parts.
+        """
+        parts = [self._part]
+        for rel in self._part.rels.values():
+            if rel.is_external:
+                continue
+            if rel.reltype in (RT.HEADER, RT.FOOTER):
+                parts.append(rel.target_part)
+        return parts
 
 
 class _Body(BlockItemContainer):

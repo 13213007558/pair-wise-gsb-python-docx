@@ -3,6 +3,17 @@
 Release History
 ---------------
 
+Unreleased
+++++++++++
+
+- Add custom XML data-store support: Document.custom_xml_stores,
+  Document.find_bound_controls(), and Document.update_bound_controls() locate
+  content controls bound via w:dataBinding, update the bound custom XML item,
+  and refresh the displayed content of all controls bound to the same item
+  (plain-text, date, and checkbox controls), atomically raising
+  docx.sdt.BindingConflictError with locatable conflicts on failure.
+
+
 1.2.0 (2025-06-16)
 ++++++++++++++++++
 
