@@ -3,6 +3,17 @@
 Release History
 ---------------
 
+Unreleased
+++++++++++
+
+- Add unified story traversal (`Document.stories`) that visits paragraphs and
+  tables in the body, nested tables, and DrawingML and VML text boxes, with
+  per-item owning part, nested-container path, and text-box anchor association.
+  `mc:AlternateContent` is resolved against an explicit capability set so
+  Choice and Fallback content is never extracted twice. Header and footer
+  parts are returned as separate stories, deduplicated when shared by
+  multiple sections.
+
 1.2.0 (2025-06-16)
 ++++++++++++++++++
 

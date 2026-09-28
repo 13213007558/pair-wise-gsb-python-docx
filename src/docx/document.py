@@ -20,6 +20,7 @@ if TYPE_CHECKING:
     from docx.oxml.document import CT_Body, CT_Document
     from docx.parts.document import DocumentPart
     from docx.settings import Settings
+    from docx.story import Stories
     from docx.styles.style import ParagraphStyle, _TableStyle
     from docx.table import Table
     from docx.text.paragraph import Paragraph
@@ -212,6 +213,20 @@ class Document(ElementProxy):
     def settings(self) -> Settings:
         """A |Settings| object providing access to the document-level settings."""
         return self._part.settings
+
+    @property
+    def stories(self) -> Stories:
+        """|Stories| object providing unified traversal of all document stories.
+
+        The main document body is one story and each header and footer part is
+        a separate story. Each story can be traversed with
+        :meth:`~docx.story.Story.iter_items`, which visits paragraphs and
+        tables in the body, nested in table cells, and inside DrawingML and VML
+        text boxes.
+        """
+        from docx.story import Stories
+
+        return Stories(self)
 
     @property
     def styles(self):
