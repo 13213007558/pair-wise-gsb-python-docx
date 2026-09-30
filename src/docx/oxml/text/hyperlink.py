@@ -32,6 +32,15 @@ class CT_Hyperlink(BaseOxmlElement):
     r = ZeroOrMore("w:r")
 
     @property
+    def r_lst(self) -> List[CT_R]:
+        """Direct and insertion-wrapped runs in this hyperlink."""
+        return self.xpath(
+            ".//w:r"
+            "[(not(ancestor::w:del) and not(ancestor::w:moveFrom))"
+            " or ancestor::w:ins[ancestor::w:del]]"
+        )
+
+    @property
     def lastRenderedPageBreaks(self) -> List[CT_LastRenderedPageBreak]:
         """All `w:lastRenderedPageBreak` descendants of this hyperlink."""
         return self.xpath("./w:r/w:lastRenderedPageBreak")
@@ -42,4 +51,11 @@ class CT_Hyperlink(BaseOxmlElement):
 
         `CT_Hyperlink` stores the hyperlink-text as one or more `w:r` children.
         """
-        return "".join(r.text for r in self.xpath("w:r"))
+        return "".join(
+            r.text
+            for r in self.xpath(
+                ".//w:r"
+                "[(not(ancestor::w:del) and not(ancestor::w:moveFrom))"
+                " or ancestor::w:ins[ancestor::w:del]]"
+            )
+        )

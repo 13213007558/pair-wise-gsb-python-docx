@@ -16,3 +16,7 @@ class InvalidSpanError(PythonDocxError):
 class InvalidXmlError(PythonDocxError):
     """Raised when invalid XML is encountered, such as on attempt to access a missing
     required child element."""
+
+
+class UnsupportedRevisionError(PythonDocxError):
+    """Raised when an accept or reject operation targets an unsupported revision."""

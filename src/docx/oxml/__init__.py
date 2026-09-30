@@ -25,6 +25,12 @@ from docx.oxml.shape import (
     CT_Transform2D,
 )
 from docx.oxml.shared import CT_DecimalNumber, CT_OnOff, CT_String
+from docx.oxml.revisions import (
+    CT_PPrChange,
+    CT_RPrChange,
+    CT_RunTrackChange,
+    CT_TrackChange,
+)
 from docx.oxml.text.hyperlink import CT_Hyperlink
 from docx.oxml.text.pagebreak import CT_LastRenderedPageBreak
 from docx.oxml.text.run import (
@@ -65,6 +71,20 @@ register_element_cls("wp:inline", CT_Inline)
 # hyperlink-related elements
 
 register_element_cls("w:hyperlink", CT_Hyperlink)
+
+# ---------------------------------------------------------------------------
+# tracked-revision-related elements
+
+register_element_cls("w:cellDel", CT_TrackChange)
+register_element_cls("w:cellIns", CT_TrackChange)
+register_element_cls("w:cellMerge", CT_TrackChange)
+register_element_cls("w:del", CT_RunTrackChange)
+register_element_cls("w:delText", CT_Text)
+register_element_cls("w:ins", CT_RunTrackChange)
+register_element_cls("w:moveFrom", CT_RunTrackChange)
+register_element_cls("w:moveTo", CT_RunTrackChange)
+register_element_cls("w:pPrChange", CT_PPrChange)
+register_element_cls("w:rPrChange", CT_RPrChange)
 
 # ---------------------------------------------------------------------------
 # text-related elements

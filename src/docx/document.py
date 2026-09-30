@@ -12,6 +12,7 @@ from docx.enum.section import WD_SECTION
 from docx.enum.text import WD_BREAK
 from docx.section import Section, Sections
 from docx.shared import ElementProxy, Emu, Inches, Length
+from docx.revisions import Revisions
 from docx.text.run import Run
 
 if TYPE_CHECKING:
@@ -194,6 +195,11 @@ class Document(ElementProxy):
     def part(self) -> DocumentPart:
         """The |DocumentPart| object of this document."""
         return self._part
+
+    @property
+    def revisions(self) -> Revisions:
+        """Tracked revisions in this document."""
+        return Revisions(self._element)
 
     def save(self, path_or_stream: str | IO[bytes]):
         """Save this document to `path_or_stream`.

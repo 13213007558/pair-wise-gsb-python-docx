@@ -35,6 +35,7 @@ class CT_R(BaseOxmlElement):
     cr = ZeroOrMore("w:cr")
     drawing = ZeroOrMore("w:drawing")
     t = ZeroOrMore("w:t")
+    delText = ZeroOrMore("w:delText")
     tab = ZeroOrMore("w:tab")
 
     def add_t(self, text: str) -> CT_Text:

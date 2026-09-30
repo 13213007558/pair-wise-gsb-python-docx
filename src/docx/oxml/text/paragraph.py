@@ -55,9 +55,22 @@ class CT_P(BaseOxmlElement):
             self.remove(child)
 
     @property
+    def r_lst(self) -> List[CT_R]:
+        """Direct and currently-visible inserted runs, in document order."""
+        return self.xpath(
+            "./w:r | .//w:r[ancestor::w:ins[not(ancestor::w:hyperlink)]]"
+            "[(not(ancestor::w:del) or ancestor::w:ins[ancestor::w:del])"
+            " and not(ancestor::w:moveFrom)]"
+        )
+
+    @property
     def inner_content_elements(self) -> List[CT_R | CT_Hyperlink]:
         """Run and hyperlink children of the `w:p` element, in document order."""
-        return self.xpath("./w:r | ./w:hyperlink")
+        return self.xpath(
+            "./w:r | ./w:hyperlink"
+            " | ./w:ins[not(ancestor::w:hyperlink)]/w:r"
+            " | ./w:ins[not(ancestor::w:hyperlink)]/w:hyperlink"
+        )
 
     @property
     def lastRenderedPageBreaks(self) -> List[CT_LastRenderedPageBreak]:
@@ -99,7 +112,14 @@ class CT_P(BaseOxmlElement):
         Inner-content child elements like `w:r` and `w:hyperlink` are translated to
         their text equivalent.
         """
-        return "".join(e.text for e in self.xpath("w:r | w:hyperlink"))
+        return "".join(
+            run.text
+            for run in self.xpath(
+                ".//w:r"
+                "[(not(ancestor::w:del) and not(ancestor::w:moveFrom))"
+                " or ancestor::w:ins[ancestor::w:del]]"
+            )
+        )
 
     def _insert_pPr(self, pPr: CT_PPr) -> CT_PPr:
         self.insert(0, pPr)
