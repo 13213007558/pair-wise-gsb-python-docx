@@ -20,6 +20,7 @@ if TYPE_CHECKING:
     from docx.enum.text import WD_UNDERLINE
     from docx.oxml.text.run import CT_R, CT_Text
     from docx.shared import Length
+    from docx.text.effective_format import ResolvedCharacterFormat
 
 
 class Run(StoryChild):
@@ -135,6 +136,13 @@ class Run(StoryChild):
         """The |Font| object providing access to the character formatting properties for
         this run, such as font name and size."""
         return Font(self._element)
+
+    @property
+    def effective_character_format(self) -> ResolvedCharacterFormat:
+        """Read-only effective character formatting with provenance for each value."""
+        from docx.text.effective_format import effective_character_format
+
+        return effective_character_format(self)
 
     @property
     def italic(self) -> bool | None:
