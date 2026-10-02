@@ -3,6 +3,15 @@
 Release History
 ---------------
 
+Unreleased
+++++++++++
+
+- Add Document.iter_list_items() resolving rendered list numbering (level,
+  counter value, and expanded label such as "2.3)" or "第十二条") through
+  abstractNum/num, lvlOverride/startOverride, lvlRestart, and style links,
+  with per-numId counters and table paragraphs in document order
+
+
 1.2.0 (2025-06-16)
 ++++++++++++++++++
 
