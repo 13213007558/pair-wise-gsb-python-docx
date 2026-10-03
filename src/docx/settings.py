@@ -10,6 +10,7 @@ if TYPE_CHECKING:
     import docx.types as t
     from docx.oxml.settings import CT_Settings
     from docx.oxml.xmlchemy import BaseOxmlElement
+    from docx.protection import DocumentProtectionInfo
 
 
 class Settings(ElementProxy):
@@ -33,3 +34,15 @@ class Settings(ElementProxy):
     @odd_and_even_pages_header_footer.setter
     def odd_and_even_pages_header_footer(self, value: bool):
         self._settings.evenAndOddHeaders_val = value
+
+    @property
+    def document_protection(self) -> DocumentProtectionInfo:
+        """A |DocumentProtectionInfo| describing the recorded protection settings.
+
+        Read-only. This reports what the file declares (edit mode and
+        enforcement); it neither verifies the password nor changes the
+        protection state.
+        """
+        from docx.protection import protection_info
+
+        return protection_info(self._settings)
