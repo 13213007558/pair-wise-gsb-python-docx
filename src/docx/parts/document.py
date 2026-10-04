@@ -12,6 +12,7 @@ from docx.parts.numbering import NumberingPart
 from docx.parts.settings import SettingsPart
 from docx.parts.story import StoryPart
 from docx.parts.styles import StylesPart
+from docx.sdt import CustomXmlStores
 from docx.shape import InlineShapes
 from docx.shared import lazyproperty
 
@@ -54,6 +55,12 @@ class DocumentPart(StoryPart):
         """A |CoreProperties| object providing read/write access to the core properties
         of this document."""
         return self.package.core_properties
+
+    @lazyproperty
+    def custom_xml_stores(self) -> CustomXmlStores:
+        """A |CustomXmlStores| object providing access to the custom XML data stores
+        of this document, keyed by their 'ds:itemID' value."""
+        return CustomXmlStores.discover(self)
 
     @property
     def document(self):

@@ -3,6 +3,15 @@
 Release History
 ---------------
 
+Unreleased
+++++++++++++++++++
+
+- Add content-control data-binding support: 'Document.content_controls' and
+  'Document.custom_xml_stores' allow updating custom XML data and explicitly
+  refreshing the displayed content of bound plain-text, checkbox, and
+  repeating-section controls via an inspectable plan/apply workflow
+
+
 1.2.0 (2025-06-16)
 ++++++++++++++++++
 

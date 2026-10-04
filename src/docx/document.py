@@ -10,6 +10,7 @@ from typing import IO, TYPE_CHECKING, Iterator, List, Sequence
 from docx.blkcntnr import BlockItemContainer
 from docx.enum.section import WD_SECTION
 from docx.enum.text import WD_BREAK
+from docx.sdt import ContentControls, CustomXmlStores
 from docx.section import Section, Sections
 from docx.shared import ElementProxy, Emu, Inches, Length
 from docx.text.run import Run
@@ -166,6 +167,22 @@ class Document(ElementProxy):
     def core_properties(self):
         """A |CoreProperties| object providing Dublin Core properties of document."""
         return self._part.core_properties
+
+    @property
+    def content_controls(self) -> ContentControls:
+        """A |ContentControls| object providing access to the content controls
+        ('w:sdt' elements) of this document.
+
+        Use 'ContentControls.plan_refresh()' to update the displayed content of
+        controls bound to custom XML after the XML data has been changed.
+        """
+        return ContentControls(self._element, self._part)
+
+    @property
+    def custom_xml_stores(self) -> CustomXmlStores:
+        """A |CustomXmlStores| object providing access to the custom XML data
+        stores of this document, keyed by their 'ds:itemID' value."""
+        return self._part.custom_xml_stores
 
     @property
     def inline_shapes(self):

@@ -26,6 +26,7 @@ from docx.opc.constants import RELATIONSHIP_TYPE as RT
 from docx.opc.part import PartFactory
 from docx.opc.parts.coreprops import CorePropertiesPart
 from docx.parts.comments import CommentsPart
+from docx.parts.customxml import CustomXmlPart
 from docx.parts.document import DocumentPart
 from docx.parts.hdrftr import FooterPart, HeaderPart
 from docx.parts.image import ImagePart
@@ -37,6 +38,8 @@ from docx.parts.styles import StylesPart
 def part_class_selector(content_type: str, reltype: str) -> Type[Part] | None:
     if reltype == RT.IMAGE:
         return ImagePart
+    if reltype == RT.CUSTOM_XML:
+        return CustomXmlPart
     return None
 
 
