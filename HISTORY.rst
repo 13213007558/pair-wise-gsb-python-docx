@@ -3,6 +3,14 @@
 Release History
 ---------------
 
+Unreleased
+++++++++++
+
+- Add Document.bindings for refreshing content controls (plain text, checkbox,
+  and repeating section) bound to custom XML data, with an inspectable
+  plan/apply refresh cycle
+
+
 1.2.0 (2025-06-16)
 ++++++++++++++++++
 

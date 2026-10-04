@@ -7,6 +7,7 @@ from __future__ import annotations
 
 from typing import IO, TYPE_CHECKING, Iterator, List, Sequence
 
+from docx.binding import DocumentBindings
 from docx.blkcntnr import BlockItemContainer
 from docx.enum.section import WD_SECTION
 from docx.enum.text import WD_BREAK
@@ -161,6 +162,17 @@ class Document(ElementProxy):
     def comments(self) -> Comments:
         """A |Comments| object providing access to comments added to the document."""
         return self._part.comments
+
+    @property
+    def bindings(self) -> DocumentBindings:
+        """|DocumentBindings| object for refreshing content controls from custom XML.
+
+        Content controls (w:sdt elements) bound to a custom XML part with a
+        w:dataBinding element can be refreshed from the current custom XML data using
+        this object, for example after updating the stored data with
+        |CustomXmlStore.set_text|.
+        """
+        return DocumentBindings(self._part, self._element)
 
     @property
     def core_properties(self):

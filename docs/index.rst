@@ -98,6 +98,7 @@ API Documentation
    api/table
    api/section
    api/comments
+   api/binding
    api/shape
    api/dml
    api/shared
